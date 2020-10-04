@@ -2,11 +2,18 @@ from gui import Ui_MainWindow
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QFileDialog
-from PyQt5.QtGui import QCloseEvent
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
+from PyQt5.QtGui import QCloseEvent, QIcon
 
 import ntpath
 import sys
+
+
+# QtNotepad
+# 2020, Karol Szapsza
+
+# Window icon (icon.png)
+# made by Freepik, http://flaticon.com/.
 
 
 class Notepad(QMainWindow):
@@ -16,6 +23,7 @@ class Notepad(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle('Untitled — Notepad')
+        self.setWindowIcon(QIcon('.\\icon.png'))
 
         # Opened file data
         self.opened_file = None
@@ -31,6 +39,9 @@ class Notepad(QMainWindow):
 
         # Edit menu tab bindings
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
+
+        # Help menu tab bindings
+        self.ui.actionNotepad_info.triggered.connect(lambda: self.help_about_pressed())
 
     # Class variables cannot be modified inside lambda, so this method is necessary
     # Besides controlling changes_made flag, adds asterisk to window title as well
@@ -103,6 +114,16 @@ class Notepad(QMainWindow):
     # Same behaviour as if [X] was pressed.
     def file_finish_pressed(self):
         self.close()
+
+    def help_about_pressed(self):
+        about_dialog = QMessageBox.about(self, 'About Notepad',
+                                         """QtNotepad
+© 2020 Karol Szapsza
+ 
+This software utilizes the PyQt5 framework,
+released under the GPL v3 license and under
+a commercial license that allows for the
+development of proprietary applications.""")
 
 
 if __name__ == "__main__":
