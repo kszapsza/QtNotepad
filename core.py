@@ -200,17 +200,14 @@ class Notepad(QMainWindow):
 
     # Format > Font
     def font_menu(self):
-        current_font = self.ui.textField.font()
-        print(current_font.family())
-
         font_dialog = QFontDialog(self)
-        font_dialog.currentFont = current_font
+        font_dialog.setCurrentFont(self.ui.textFieldWidget.font())
         font_dialog.setWindowTitle('Font…')
 
-        selected_font = font_dialog.getFont()
-
-        if selected_font[0] is not None:
-            self.ui.textFieldWidget.setFont(selected_font[0])
+        if font_dialog.exec_():
+            selected_font = font_dialog.currentFont()
+            if selected_font is not None:
+                self.ui.textFieldWidget.setFont(selected_font)
 
     # View > Zoom > Zoom in
     def zoom_in(self):
@@ -241,7 +238,10 @@ class Notepad(QMainWindow):
 This software utilizes the PyQt5 framework,
 released under the GPL v3 license and under
 a commercial license that allows for the
-development of proprietary applications.""")
+development of proprietary applications.
+
+Window icon (icon.png) made by Freepik,
+http://flaticon.com/.""")
 
 
 if __name__ == "__main__":
