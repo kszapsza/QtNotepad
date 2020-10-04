@@ -1,9 +1,9 @@
 from gui import Ui_MainWindow
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QStandardPaths
+from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
-from PyQt5.QtGui import QCloseEvent, QIcon, QFont
+from PyQt5.QtGui import QCloseEvent, QIcon, QFont, QDesktopServices
 
 import ntpath
 import sys
@@ -22,7 +22,9 @@ class Notepad(QMainWindow):
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon('.\\icon.png'))
+
+        self.notepad_icon = QIcon('.\\icon.png')
+        self.setWindowIcon(self.notepad_icon)
 
         self.last_path = QStandardPaths.displayName(QStandardPaths.DesktopLocation)
         self.zoom_amnt = 0
@@ -50,6 +52,7 @@ class Notepad(QMainWindow):
         self.ui.actionCopy.triggered.connect(lambda: self.ui.textField.copy())
         self.ui.actionPaste.triggered.connect(lambda: self.ui.textField.paste())
         self.ui.actionDelete.triggered.connect(lambda: self.ui.textField.textCursor().removeSelectedText())
+        self.ui.actionSearch_in_Google.triggered.connect(lambda: self.search_with_google())
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
 
         # Format menu tab bindings
@@ -62,6 +65,8 @@ class Notepad(QMainWindow):
         self.ui.actionZoom_in.triggered.connect(lambda: self.zoom_in())
         self.ui.actionZoom_out.triggered.connect(lambda: self.zoom_out())
         self.ui.actionRestore_default_zoom.triggered.connect(lambda: self.restore_zoom())
+        self.ui.actionStatus_bar.setChecked(True)
+        self.ui.actionStatus_bar.triggered.connect(lambda: self.hide_show_status_bar())
 
         # Help menu tab bindings
         self.ui.actionNotepad_info.triggered.connect(lambda: self.help_about_pressed())
@@ -97,6 +102,8 @@ class Notepad(QMainWindow):
         unsaved_text = 'Do you wish to save changes in file ' + self.opened_filepath + '?'
         unsaved = QMessageBox(QMessageBox.Warning, 'Notepad', unsaved_text,
                               QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+        unsaved.setMaximumWidth(200)
+        unsaved.setWindowIcon(self.notepad_icon)
         return unsaved.exec_()
 
     # Overriden closeEvent() method prompting if to save if unsaved changes were made
@@ -198,6 +205,13 @@ class Notepad(QMainWindow):
     def file_finish_pressed(self):
         self.close()
 
+    # Edit > Search with Google
+    def search_with_google(self):
+        original_text = self.ui.textField.textCursor().selectedText()
+        raw_text = original_text.replace(' ', '+')
+        raw_text = raw_text.replace('&', '+')
+        QDesktopServices.openUrl(QUrl('http:://google.com/search?q=' + raw_text))
+
     # Format > Font
     def font_menu(self):
         font_dialog = QFontDialog(self)
@@ -205,9 +219,8 @@ class Notepad(QMainWindow):
         font_dialog.setWindowTitle('Font…')
 
         if font_dialog.exec_():
-            selected_font = font_dialog.currentFont()
-            if selected_font is not None:
-                self.ui.textFieldWidget.setFont(selected_font)
+            if font_dialog.currentFontChanged:
+                self.ui.textFieldWidget.setFont(font_dialog.currentFont())
 
     # View > Zoom > Zoom in
     def zoom_in(self):
@@ -228,6 +241,13 @@ class Notepad(QMainWindow):
         elif self.zoom_amnt > 0:
             while self.zoom_amnt != 0:
                 self.zoom_out()
+
+    # View > Status bar
+    def hide_show_status_bar(self):
+        if self.ui.statusbar.isHidden():
+            self.ui.statusbar.show()
+        else:
+            self.ui.statusbar.hide()
 
     # Help > About Notepad
     def help_about_pressed(self):
