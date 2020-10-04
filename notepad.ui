@@ -16,7 +16,7 @@
   <property name="locale">
    <locale language="English" country="UnitedKingdom"/>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="textFieldWidget">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -279,6 +279,9 @@
    </property>
   </action>
   <action name="actionWord_wrap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Word wrap</string>
    </property>
@@ -313,6 +316,9 @@
    </property>
   </action>
   <action name="actionStatus_bar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Status bar</string>
    </property>

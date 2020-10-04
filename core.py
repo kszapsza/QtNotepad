@@ -2,8 +2,8 @@ from gui import Ui_MainWindow
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
-from PyQt5.QtGui import QCloseEvent, QIcon
+from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
+from PyQt5.QtGui import QCloseEvent, QIcon, QFont
 
 import ntpath
 import sys
@@ -25,13 +25,16 @@ class Notepad(QMainWindow):
         self.setWindowIcon(QIcon('.\\icon.png'))
 
         self.last_path = QStandardPaths.displayName(QStandardPaths.DesktopLocation)
+        self.zoom_amnt = 0
 
         # Opened file data
         self.opened_filepath = 'Untitled'
         self.changes_made = False
 
-        # Set flag if text was modified
+        # Text changing bindings
         self.ui.textField.textChanged.connect(lambda: self.set_changes_made())
+        self.ui.textField.selectionChanged.connect(lambda: self.disable_selection_dependent())
+        self.disable_selection_dependent()
 
         # File menu tab bindings
         self.ui.actionNew.triggered.connect(lambda: self.file_new_pressed())
@@ -41,7 +44,24 @@ class Notepad(QMainWindow):
         self.ui.actionFinish.triggered.connect(lambda: self.file_finish_pressed())
 
         # Edit menu tab bindings
+        self.ui.actionUndo.triggered.connect(lambda: self.ui.textField.undo())
+        self.ui.actionRedo.triggered.connect(lambda: self.ui.textField.redo())
+        self.ui.actionCut.triggered.connect(lambda: self.ui.textField.cut())
+        self.ui.actionCopy.triggered.connect(lambda: self.ui.textField.copy())
+        self.ui.actionPaste.triggered.connect(lambda: self.ui.textField.paste())
+        self.ui.actionDelete.triggered.connect(lambda: self.ui.textField.textCursor().removeSelectedText())
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
+
+        # Format menu tab bindings
+        self.ui.actionWord_wrap.setChecked(True)
+        self.ui.actionWord_wrap.triggered.connect(
+            lambda: self.ui.textField.setLineWrapMode(self.ui.actionWord_wrap.isChecked()))
+        self.ui.actionFont.triggered.connect(lambda: self.font_menu())
+
+        # View menu tab bindings
+        self.ui.actionZoom_in.triggered.connect(lambda: self.zoom_in())
+        self.ui.actionZoom_out.triggered.connect(lambda: self.zoom_out())
+        self.ui.actionRestore_default_zoom.triggered.connect(lambda: self.restore_zoom())
 
         # Help menu tab bindings
         self.ui.actionNotepad_info.triggered.connect(lambda: self.help_about_pressed())
@@ -59,6 +79,18 @@ class Notepad(QMainWindow):
 
         if self.windowTitle()[0] == '*':
             self.setWindowTitle(self.windowTitle()[1:])
+
+    def disable_selection_dependent(self):
+        if len(self.ui.textField.textCursor().selectedText()) == 0:
+            self.ui.actionCut.setDisabled(True)
+            self.ui.actionCopy.setDisabled(True)
+            self.ui.actionDelete.setDisabled(True)
+            self.ui.actionSearch_in_Google.setDisabled(True)
+        else:
+            self.ui.actionCut.setEnabled(True)
+            self.ui.actionCopy.setEnabled(True)
+            self.ui.actionDelete.setEnabled(True)
+            self.ui.actionSearch_in_Google.setEnabled(True)
 
     # Prompts if user wants to save unsaved changes
     def ask_if_to_save(self):
@@ -166,6 +198,41 @@ class Notepad(QMainWindow):
     def file_finish_pressed(self):
         self.close()
 
+    # Format > Font
+    def font_menu(self):
+        current_font = self.ui.textField.font()
+        print(current_font.family())
+
+        font_dialog = QFontDialog(self)
+        font_dialog.currentFont = current_font
+        font_dialog.setWindowTitle('Font…')
+
+        selected_font = font_dialog.getFont()
+
+        if selected_font[0] is not None:
+            self.ui.textFieldWidget.setFont(selected_font[0])
+
+    # View > Zoom > Zoom in
+    def zoom_in(self):
+        self.ui.textField.zoomIn(2)
+        self.zoom_amnt += 1
+
+    # View > Zoom > Zoom out
+    def zoom_out(self):
+        if self.zoom_amnt > -5:
+            self.ui.textField.zoomOut(2)
+            self.zoom_amnt -= 1
+
+    # View > Zoom > Restore default zoom
+    def restore_zoom(self):
+        if self.zoom_amnt < 0:
+            while self.zoom_amnt != 0:
+                self.zoom_in()
+        elif self.zoom_amnt > 0:
+            while self.zoom_amnt != 0:
+                self.zoom_out()
+
+    # Help > About Notepad
     def help_about_pressed(self):
         QMessageBox.about(self, 'About Notepad',
                           """QtNotepad
