@@ -51,8 +51,8 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionNew = QtWidgets.QAction(MainWindow)
         self.actionNew.setObjectName("actionNew")
-        self.actionNew_window = QtWidgets.QAction(MainWindow)
-        self.actionNew_window.setObjectName("actionNew_window")
+        self.actionOpen = QtWidgets.QAction(MainWindow)
+        self.actionOpen.setObjectName("actionOpen")
         self.actionSave = QtWidgets.QAction(MainWindow)
         self.actionSave.setObjectName("actionSave")
         self.actionSave_as = QtWidgets.QAction(MainWindow)
@@ -104,7 +104,7 @@ class Ui_MainWindow(object):
         self.actionNotepad_info = QtWidgets.QAction(MainWindow)
         self.actionNotepad_info.setObjectName("actionNotepad_info")
         self.menuFile.addAction(self.actionNew)
-        self.menuFile.addAction(self.actionNew_window)
+        self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave)
         self.menuFile.addAction(self.actionSave_as)
         self.menuFile.addSeparator()
@@ -147,7 +147,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Notepad"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuEdit.setTitle(_translate("MainWindow", "Edit"))
         self.menuFormat.setTitle(_translate("MainWindow", "Format"))
@@ -155,7 +155,7 @@ class Ui_MainWindow(object):
         self.menuZoom.setTitle(_translate("MainWindow", "Zoom"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionNew.setText(_translate("MainWindow", "New"))
-        self.actionNew_window.setText(_translate("MainWindow", "Open…"))
+        self.actionOpen.setText(_translate("MainWindow", "Open…"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
         self.actionSave_as.setText(_translate("MainWindow", "Save as…"))
         self.actionFinish.setText(_translate("MainWindow", "Finish"))
@@ -185,7 +185,6 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

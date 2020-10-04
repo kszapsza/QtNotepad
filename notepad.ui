@@ -59,7 +59,7 @@
      <string>File</string>
     </property>
     <addaction name="actionNew"/>
-    <addaction name="actionNew_window"/>
+    <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_as"/>
     <addaction name="separator"/>
@@ -129,7 +129,7 @@
     <string>New</string>
    </property>
   </action>
-  <action name="actionNew_window">
+  <action name="actionOpen">
    <property name="text">
     <string>Open…</string>
    </property>
