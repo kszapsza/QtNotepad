@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton
-from PyQt5.QtGui import QCloseEvent, QTextCursor
+from PyQt5.QtGui import QCloseEvent
 
 from gui import Ui_MainWindow
 import sys
@@ -20,41 +20,36 @@ class Notepad(QMainWindow):
         # Edit menu tab bindings
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
 
-    def closeEvent(self, evnt: QCloseEvent):
-        self.file_finish_pressed()
-
-    def ask_if_to_save(self):
-        unsaved = QMessageBox(self)
-
-        unsaved.setIcon(QMessageBox.Warning)
-        unsaved.setWindowTitle('Notepad')
-        unsaved.setText('Do you wish to save changes in file?')
-
-        unsaved.addButton(QPushButton('Save'), QMessageBox.YesRole)
-        unsaved.addButton(QPushButton('Don\'t save'), QMessageBox.NoRole)
-        unsaved.addButton(QMessageBox.Cancel)
-
+    @staticmethod
+    def ask_if_to_save():
+        unsaved = QMessageBox(QMessageBox.Warning, 'Notepad', 'Do you wish to save changes in file?',
+                              QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
         return unsaved.exec_()
 
-    def file_new_pressed(self):
-        if len(self.ui.textField.toPlainText()) != 0:
-            unsaved_decision = self.ask_if_to_save()
-
-            if unsaved_decision == QMessageBox.Yes:
-                print('saved')
-            if unsaved_decision != QMessageBox.Cancel:
-                self.ui.textField.clear()
-
-    def file_finish_pressed(self):
+    def closeEvent(self, evnt: QCloseEvent):
         if len(self.ui.textField.toPlainText()) == 0:
             self.close()
         else:
             unsaved_decision = self.ask_if_to_save()
 
-            if unsaved_decision == QMessageBox.Yes:
+            if unsaved_decision == QMessageBox.Save:
                 print('saved')
-            elif unsaved_decision != QMessageBox.Cancel:
+            elif unsaved_decision == QMessageBox.Cancel:
+                evnt.ignore()
+            else:
                 self.close()
+
+    def file_new_pressed(self):
+        if len(self.ui.textField.toPlainText()) != 0:
+            unsaved_decision = self.ask_if_to_save()
+
+            if unsaved_decision == QMessageBox.Save:
+                print('saved')
+            if unsaved_decision != QMessageBox.Cancel:
+                self.ui.textField.clear()
+
+    def file_finish_pressed(self):
+        self.close()
 
 
 if __name__ == "__main__":
