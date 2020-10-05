@@ -1,9 +1,10 @@
-from gui import Ui_MainWindow
+import gui
+import find
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
-from PyQt5.QtGui import QCloseEvent, QIcon, QFont, QDesktopServices
+from PyQt5.QtGui import QCloseEvent, QIcon, QFont, QDesktopServices, QTextCursor
 
 import ntpath
 import sys
@@ -12,15 +13,17 @@ import sys
 # QtNotepad
 # 2020, Karol Szapsza
 
-# Window icon (icon.png)
-# made by Freepik, http://flaticon.com/.
+# This software utilizes the PyQt5 framework, released under the GPL v3 license and under
+# a commercial license that allows for the development of proprietary applications.
+
+# Window icon (icon.png) made by Freepik, http://flaticon.com/.
 
 
 class Notepad(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.ui = Ui_MainWindow()
+        self.ui = gui.Ui_MainWindow()
         self.ui.setupUi(self)
 
         self.notepad_icon = QIcon('.\\icon.png')
@@ -52,7 +55,8 @@ class Notepad(QMainWindow):
         self.ui.actionCopy.triggered.connect(lambda: self.ui.textField.copy())
         self.ui.actionPaste.triggered.connect(lambda: self.ui.textField.paste())
         self.ui.actionDelete.triggered.connect(lambda: self.ui.textField.textCursor().removeSelectedText())
-        self.ui.actionSearch_in_Google.triggered.connect(lambda: self.search_with_google())
+        self.ui.actionFind.triggered.connect(lambda: self.edit_find())
+        self.ui.actionSearch_in_Google.triggered.connect(lambda: self.edit_search_with_google())
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
 
         # Format menu tab bindings
@@ -206,11 +210,16 @@ class Notepad(QMainWindow):
         self.close()
 
     # Edit > Search with Google
-    def search_with_google(self):
+    def edit_search_with_google(self):
         original_text = self.ui.textField.textCursor().selectedText()
         raw_text = original_text.replace(' ', '+')
         raw_text = raw_text.replace('&', '+')
         QDesktopServices.openUrl(QUrl('http:://google.com/search?q=' + raw_text))
+
+    # Edit > Find...
+    def edit_find(self):
+        find_dialog = find.Find(parent=self)
+        find_dialog.exec_()
 
     # Format > Font
     def font_menu(self):
