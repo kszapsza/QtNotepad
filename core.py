@@ -19,6 +19,7 @@ import sys
 # Window icon (icon.png) made by Freepik, http://flaticon.com/.
 
 
+# Main Notepad window class.
 class Notepad(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -31,6 +32,11 @@ class Notepad(QMainWindow):
 
         self.last_path = QStandardPaths.displayName(QStandardPaths.DesktopLocation)
         self.zoom_amnt = 0
+
+        # Find/replace data need to be stored in parent window class in order to
+        # make possibility for calling Find previous/Find next from the main window menu bar.
+
+        self.query_text = None
 
         # Opened file data
         self.opened_filepath = 'Untitled'

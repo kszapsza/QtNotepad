@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon, QTextCursor
 from PyQt5.QtWidgets import QDialog, QMainWindow, QMessageBox
 
 
+# Edit > Find...QDialog class.
 class Find(QDialog):
     def __init__(self, parent: core.Notepad):
         super().__init__()
@@ -16,6 +17,8 @@ class Find(QDialog):
         self.parent = parent
         self.dialog_icon = QIcon('.\\icon.png')
         self.setWindowIcon(self.dialog_icon)
+
+        self.start_index = 0
 
         self.setModal(True)
         # noinspection PyTypeChecker
@@ -30,29 +33,48 @@ class Find(QDialog):
         self.ui.cancel_button.released.connect(lambda: self.close())
 
         self.ui.find_button.setDisabled(True)  # disabled on startup
-        self.ui.find_line_edit.textChanged.connect(lambda: self.disable_buttons())
+        self.ui.find_line_edit.textChanged.connect(lambda: self.text_changed())
         self.ui.find_line_edit.setFocus()
 
-    def disable_buttons(self):
+    def text_changed(self):
         if len(self.ui.find_line_edit.text()) == 0:
             self.ui.find_button.setDisabled(True)
+            self.start_index = 0  # reset find index data when new query was given
         else:
             self.ui.find_button.setEnabled(True)
+
+    def not_found(self, query_text):
+        not_found_msg = QMessageBox(QMessageBox.Information, 'Notepad',
+                                    'Cannot find: "' + query_text + '"',
+                                    QMessageBox.Ok, self)
+        not_found_msg.setWindowIcon(self.dialog_icon)
+        not_found_msg.setMinimumWidth(300)
+        not_found_msg.show()
 
     def find_text(self):
         file_text = self.parent.ui.textField.toPlainText()
         query_text = self.ui.find_line_edit.text()
-        result = file_text.find(query_text)
 
-        if result == -1 or len(file_text) == 0:
-            not_found_msg = QMessageBox(QMessageBox.Information,
-                                        'Notepad', 'Cannot find: "' + query_text + '"',
-                                        QMessageBox.Ok, self)
-            not_found_msg.setWindowIcon(self.dialog_icon)
-            not_found_msg.setMinimumWidth(300)
-            not_found_msg.show()
+        if self.ui.match_case_checkbox.isChecked():
+            result = file_text.find(query_text, self.start_index)
+        else:
+            result = file_text.lower().find(query_text.lower(), self.start_index)
+
+        if len(file_text) == 0:
+            self.not_found(query_text)
+
+        elif result == -1:
+            if self.ui.wrap_around_checkbox.isChecked() and self.start_index != 0:
+                self.start_index = 0
+                self.find_text()
+            else:
+                self.not_found(query_text)
+
         else:
             new_cursor = self.parent.ui.textField.textCursor()
             new_cursor.setPosition(result)
             new_cursor.setPosition(result + len(query_text), QTextCursor.KeepAnchor)
             self.parent.ui.textField.setTextCursor(new_cursor)
+
+            self.start_index = result + 1
+            self.parent.query_text = query_text
