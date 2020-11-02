@@ -4,7 +4,7 @@ import find
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
-from PyQt5.QtGui import QCloseEvent, QIcon, QFont, QDesktopServices, QTextCursor
+from PyQt5.QtGui import QCloseEvent, QIcon, QDesktopServices
 
 import ntpath
 import sys
@@ -35,7 +35,6 @@ class Notepad(QMainWindow):
 
         # Find/replace data need to be stored in parent window class in order to
         # make possibility for calling Find previous/Find next from the main window menu bar.
-
         self.query_text = None
 
         # Opened file data
@@ -80,6 +79,7 @@ class Notepad(QMainWindow):
 
         # Help menu tab bindings
         self.ui.actionNotepad_info.triggered.connect(lambda: self.help_about_pressed())
+        self.ui.actionSend_feedback.triggered.connect(lambda: self.help_send_feedback_pressed())
 
     # Class variables cannot be modified inside lambda, so this method is necessary
     # Besides controlling changes_made flag, adds asterisk to window title as well
@@ -220,7 +220,7 @@ class Notepad(QMainWindow):
         original_text = self.ui.textField.textCursor().selectedText()
         raw_text = original_text.replace(' ', '+')
         raw_text = raw_text.replace('&', '+')
-        QDesktopServices.openUrl(QUrl('http:://google.com/search?q=' + raw_text))
+        QDesktopServices.openUrl(QUrl('http://google.com/search?q=' + raw_text))
 
     # Edit > Find...
     def edit_find(self):
@@ -277,6 +277,10 @@ development of proprietary applications.
 
 Window icon (icon.png) made by Freepik,
 http://flaticon.com/.""")
+
+    @staticmethod
+    def help_send_feedback_pressed():
+        QDesktopServices.openUrl(QUrl('http://m.me/DJFpolska'))
 
 
 if __name__ == "__main__":
