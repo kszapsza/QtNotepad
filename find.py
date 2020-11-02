@@ -3,7 +3,7 @@ from find_gui import Ui_Find
 
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon, QTextCursor
-from PyQt5.QtWidgets import QDialog, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QDialog, QMessageBox
 
 
 # Edit > Find...QDialog class.

@@ -3,8 +3,8 @@ import find
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths, QUrl
-from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
 from PyQt5.QtGui import QCloseEvent, QIcon, QDesktopServices, QTextCursor
+from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
 
 from datetime import datetime
 import ntpath
@@ -80,8 +80,9 @@ class Notepad(QMainWindow):
         self.ui.actionStatus_bar.triggered.connect(lambda: self.hide_show_status_bar())
 
         # Help menu tab bindings
-        self.ui.actionNotepad_info.triggered.connect(lambda: self.help_about_pressed())
+        self.ui.actionShow_help.triggered.connect(lambda: self.help_show_help_pressed())
         self.ui.actionSend_feedback.triggered.connect(lambda: self.help_send_feedback_pressed())
+        self.ui.actionNotepad_info.triggered.connect(lambda: self.help_about_pressed())
 
     # Class variables cannot be modified inside lambda, so this method is necessary
     # Besides controlling changes_made flag, adds asterisk to window title as well
@@ -285,6 +286,18 @@ class Notepad(QMainWindow):
         else:
             self.ui.statusbar.hide()
 
+    # Help > Show help
+    @staticmethod
+    def help_show_help_pressed():
+        QDesktopServices.openUrl(
+            QUrl('http://google.com/search?q=uzyskiwanie+pomocy+dotyczącej+'
+                 'notatnika+w+systemie+windows+10'))
+
+    # Help > Send feedback
+    @staticmethod
+    def help_send_feedback_pressed():
+        QDesktopServices.openUrl(QUrl('http://m.me/DJFpolska'))
+
     # Help > About Notepad
     def help_about_pressed(self):
         QMessageBox.about(self, 'About Notepad',
@@ -298,10 +311,6 @@ development of proprietary applications.
 
 Window icon (icon.png) made by Freepik,
 http://flaticon.com/.""")
-
-    @staticmethod
-    def help_send_feedback_pressed():
-        QDesktopServices.openUrl(QUrl('http://m.me/DJFpolska'))
 
 
 if __name__ == "__main__":
