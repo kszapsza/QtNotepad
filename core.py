@@ -1,10 +1,10 @@
-import gui
+from gui import core_gui
 import find
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtGui import QCloseEvent, QIcon, QDesktopServices, QTextCursor
-from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox, QInputDialog
 
 from datetime import datetime
 import ntpath
@@ -25,7 +25,7 @@ class Notepad(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.ui = gui.Ui_MainWindow()
+        self.ui = core_gui.Ui_MainWindow()
         self.ui.setupUi(self)
 
         self.notepad_icon = QIcon('.\\icon.png')
@@ -62,15 +62,21 @@ class Notepad(QMainWindow):
         self.ui.actionPaste.triggered.connect(lambda: self.ui.textField.paste())
         self.ui.actionDelete.triggered.connect(lambda: self.ui.textField.textCursor().removeSelectedText())
         self.ui.actionFind.triggered.connect(lambda: self.edit_find())
+
+        self.ui.actionFind_next.triggered.connect(lambda: self.edit_find_next())
+        self.ui.actionFind_previous.triggered.connect(lambda: self.edit_find_previous())
+        self.ui.actionReplace.triggered.connect(lambda: self.edit_replace())
+        self.ui.actionGo_to.triggered.connect(lambda: self.edit_go_to())
+
+        self.ui.actionGo_to.setDisabled(False)
         self.ui.actionSearch_in_Google.triggered.connect(lambda: self.edit_search_with_google())
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
         self.ui.actionTime_date.triggered.connect(lambda: self.edit_time_date())
 
         # Format menu tab bindings
-        self.ui.actionWord_wrap.setChecked(True)
-        self.ui.actionWord_wrap.triggered.connect(
-            lambda: self.ui.textField.setLineWrapMode(self.ui.actionWord_wrap.isChecked()))
-        self.ui.actionFont.triggered.connect(lambda: self.font_menu())
+        self.ui.actionWord_wrap.setChecked(False)
+        self.ui.actionWord_wrap.triggered.connect(lambda: self.format_word_wrap())
+        self.ui.actionFont.triggered.connect(lambda: self.format_font())
 
         # View menu tab bindings
         self.ui.actionZoom_in.triggered.connect(lambda: self.zoom_in())
@@ -225,6 +231,42 @@ class Notepad(QMainWindow):
         raw_text = raw_text.replace('&', '+')
         QDesktopServices.openUrl(QUrl('http://google.com/search?q=' + raw_text))
 
+    # Edit > Find...
+    def edit_find(self):
+        find_dialog = find.Find(parent=self)
+        find_dialog.exec_()
+
+    # Edit > Find Next
+    def edit_find_next(self):
+        pass
+
+    # Edit > Find Previous
+    def edit_find_previous(self):
+        pass
+
+    # Edit > Replace...
+    def edit_replace(self):
+        pass
+
+    # Edit > Go To...
+    def edit_go_to(self):
+        dialog = QInputDialog()
+
+        dialog.setWindowTitle('Go To Line')
+        dialog.setLabelText('Line number:')
+        dialog.setOkButtonText('Go To')
+        dialog.setInputMode(QInputDialog.IntInput)
+        dialog.setWindowIcon(self.notepad_icon)
+
+        dialog.exec()
+        line_number = dialog.intValue()
+
+        if line_number > 0:
+            new_cursor = self.ui.textField.textCursor()
+            new_cursor.movePosition(QTextCursor.Start, QTextCursor.MoveAnchor)
+            new_cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, line_number - 1)
+            self.ui.textField.setTextCursor(new_cursor)
+
     # Edit > Time/Date
     def edit_time_date(self):
         file_text = self.ui.textField.toPlainText()
@@ -244,13 +286,13 @@ class Notepad(QMainWindow):
 
         self.ui.textField.setTextCursor(new_cursor)
 
-    # Edit > Find...
-    def edit_find(self):
-        find_dialog = find.Find(parent=self)
-        find_dialog.exec_()
+    # Format > Word wrap
+    def format_word_wrap(self):
+        self.ui.textField.setLineWrapMode(self.ui.actionWord_wrap.isChecked())
+        self.ui.actionGo_to.setDisabled(self.ui.actionWord_wrap.isChecked())
 
     # Format > Font
-    def font_menu(self):
+    def format_font(self):
         font_dialog = QFontDialog(self)
         font_dialog.setCurrentFont(self.ui.textFieldWidget.font())
         font_dialog.setWindowTitle('Font…')
