@@ -21,6 +21,11 @@ class Find(QDialog):
         self.start_index = 0
         self.rfind_end_index = 0
 
+        # This stops the recursive call of Find after one cycle - when there are
+        # no results. This flag is being reset when user manually presses Find button,
+        # or when the query text has changed.
+        self.auto_wrap_count = 0
+
         self.setModal(True)
 
         # noinspection PyTypeChecker
@@ -31,7 +36,7 @@ class Find(QDialog):
         self.ui.down_radio.setChecked(True)
         self.ui.wrap_around_checkbox.setChecked(True)
 
-        self.ui.find_button.released.connect(lambda: self.find_text())
+        self.ui.find_button.released.connect(lambda: self.find_next_pressed())
         self.ui.cancel_button.released.connect(lambda: self.close())
 
         self.ui.find_button.setDisabled(True)  # disabled on startup
@@ -39,6 +44,8 @@ class Find(QDialog):
         self.ui.find_line_edit.setFocus()
 
     def text_changed(self):
+        self.auto_wrap_count = 0
+
         if len(self.ui.find_line_edit.text()) == 0:
             self.ui.find_button.setDisabled(True)
             self.start_index = 0  # reset find index data when new query was given
@@ -52,6 +59,10 @@ class Find(QDialog):
         not_found_msg.setWindowIcon(self.dialog_icon)
         not_found_msg.setMinimumWidth(300)
         not_found_msg.show()
+
+    def find_next_pressed(self):
+        self.auto_wrap_count = 0
+        self.find_text()
 
     def find_text(self):
         file_text = self.parent.ui.textField.toPlainText()
@@ -78,22 +89,25 @@ class Find(QDialog):
 
             self.rfind_end_index = result - 1
 
-        # Result if empty
+        # Not found, if empty:
         if len(file_text) == 0:
             self.not_found(query_text)
 
-        # Not found (end)
+        # Not found:
         elif result == -1:
-            # Wrap around
-            if self.ui.wrap_around_checkbox.isChecked():
+            # Wrap around - only once automatically
+            if self.ui.wrap_around_checkbox.isChecked() and self.auto_wrap_count < 1:
                 self.start_index = 0
                 self.rfind_end_index = len(file_text) - 1
-                self.find_text()
-            # Do not wrap around
+                self.auto_wrap_count += 1  # count the cycle to prevent infinite recursion
+                self.find_text()  # call only once again recursively
+
+            # Do not wrap around:
+            # either wrapping is set to off, or there are NO results in WHOLE text
             else:
                 self.not_found(query_text)
 
-        # Found
+        # Found a record:
         else:
             new_cursor = self.parent.ui.textField.textCursor()
             new_cursor.setPosition(result)
@@ -101,3 +115,5 @@ class Find(QDialog):
 
             self.parent.ui.textField.setTextCursor(new_cursor)
             self.parent.query_text = query_text
+
+        return result
