@@ -1,5 +1,5 @@
 import core
-from find_gui import Ui_Find
+from gui.find_gui import Ui_Find
 
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon, QTextCursor
