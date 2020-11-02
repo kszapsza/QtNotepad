@@ -2,19 +2,18 @@ import core
 from gui.find_gui import Ui_Find
 
 from PyQt5 import QtCore
-from PyQt5.QtGui import QIcon, QTextCursor
+from PyQt5.QtGui import QIcon, QTextCursor, QFocusEvent
 from PyQt5.QtWidgets import QDialog, QMessageBox
 
 
 # Edit > Find...QDialog class.
 class Find(QDialog):
     def __init__(self, parent: core.Notepad):
-        super().__init__()
+        super().__init__(parent)
 
         self.ui = Ui_Find()
         self.ui.setupUi(self)
 
-        self.parent = parent
         self.dialog_icon = QIcon('.\\icon.png')
         self.setWindowIcon(self.dialog_icon)
 
@@ -26,12 +25,15 @@ class Find(QDialog):
         # or when the query text has changed.
         self.auto_wrap_count = 0
 
-        self.setModal(True)
+        self.setWindowModality(QtCore.Qt.NonModal)
+        self.setFixedSize(self.width(), self.height())
 
         # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags()
-                            & QtCore.Qt.WindowStaysOnTopHint
-                            & ~QtCore.Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & (
+                              QtCore.Qt.Tool
+                            | QtCore.Qt.FramelessWindowHint
+                            | QtCore.Qt.WindowStaysOnTopHint
+                            | ~QtCore.Qt.WindowContextHelpButtonHint))
 
         self.ui.down_radio.setChecked(True)
         self.ui.wrap_around_checkbox.setChecked(True)
@@ -43,8 +45,16 @@ class Find(QDialog):
         self.ui.find_line_edit.textChanged.connect(lambda: self.text_changed())
         self.ui.find_line_edit.setFocus()
 
+    def focusOutEvent(self, e: QFocusEvent):
+        self.setWindowOpacity(0.5)
+        self.show()
+
+    def focusInEvent(self, e: QFocusEvent):
+        self.setWindowOpacity(1)
+
     def text_changed(self):
         self.auto_wrap_count = 0
+        self.rfind_end_index = 0
 
         if len(self.ui.find_line_edit.text()) == 0:
             self.ui.find_button.setDisabled(True)
@@ -65,7 +75,7 @@ class Find(QDialog):
         self.find_text()
 
     def find_text(self):
-        file_text = self.parent.ui.textField.toPlainText()
+        file_text = self.parent().ui.textField.toPlainText()
         query_text = self.ui.find_line_edit.text()
 
         if self.rfind_end_index == 0:
@@ -96,6 +106,7 @@ class Find(QDialog):
         # Not found:
         elif result == -1:
             # Wrap around - only once automatically
+            # TODO: analyse recursion behavior
             if self.ui.wrap_around_checkbox.isChecked() and self.auto_wrap_count < 1:
                 self.start_index = 0
                 self.rfind_end_index = len(file_text) - 1
@@ -109,11 +120,9 @@ class Find(QDialog):
 
         # Found a record:
         else:
-            new_cursor = self.parent.ui.textField.textCursor()
+            new_cursor = self.parent().ui.textField.textCursor()
             new_cursor.setPosition(result)
             new_cursor.setPosition(result + len(query_text), QTextCursor.KeepAnchor)
 
-            self.parent.ui.textField.setTextCursor(new_cursor)
-            self.parent.query_text = query_text
-
-        return result
+            self.parent().ui.textField.setTextCursor(new_cursor)
+            self.parent().query_text = query_text

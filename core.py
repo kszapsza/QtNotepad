@@ -19,7 +19,6 @@ import sys
 
 # Window icon (icon.png) made by Freepik, http://flaticon.com/.
 
-
 # Main Notepad window class.
 class Notepad(QMainWindow):
     def __init__(self):
@@ -234,7 +233,7 @@ class Notepad(QMainWindow):
     # Edit > Find...
     def edit_find(self):
         find_dialog = find.Find(parent=self)
-        find_dialog.exec_()
+        find_dialog.show()
 
     # Edit > Find Next
     def edit_find_next(self):
