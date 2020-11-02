@@ -4,8 +4,9 @@ import find
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths, QUrl
 from PyQt5.QtWidgets import QFileDialog, QFontDialog, QMainWindow, QMessageBox
-from PyQt5.QtGui import QCloseEvent, QIcon, QDesktopServices
+from PyQt5.QtGui import QCloseEvent, QIcon, QDesktopServices, QTextCursor
 
+from datetime import datetime
 import ntpath
 import sys
 
@@ -63,6 +64,7 @@ class Notepad(QMainWindow):
         self.ui.actionFind.triggered.connect(lambda: self.edit_find())
         self.ui.actionSearch_in_Google.triggered.connect(lambda: self.edit_search_with_google())
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
+        self.ui.actionTime_date.triggered.connect(lambda: self.edit_time_date())
 
         # Format menu tab bindings
         self.ui.actionWord_wrap.setChecked(True)
@@ -221,6 +223,25 @@ class Notepad(QMainWindow):
         raw_text = original_text.replace(' ', '+')
         raw_text = raw_text.replace('&', '+')
         QDesktopServices.openUrl(QUrl('http://google.com/search?q=' + raw_text))
+
+    # Edit > Time/Date
+    def edit_time_date(self):
+        file_text = self.ui.textField.toPlainText()
+        file_text_end = len(file_text) - 1
+        cursor_pos = self.ui.textField.textCursor().position()
+
+        date_time = datetime.now()
+        date_time_str = date_time.strftime("%H:%M %d/%m/%Y")
+
+        self.ui.textField.setPlainText(file_text[0:cursor_pos]
+                                       + date_time_str
+                                       + file_text[cursor_pos:file_text_end])
+
+        new_cursor = self.ui.textField.textCursor()
+        new_cursor.movePosition(QTextCursor.Right, QTextCursor.MoveAnchor,
+                                cursor_pos + len(date_time_str))
+
+        self.ui.textField.setTextCursor(new_cursor)
 
     # Edit > Find...
     def edit_find(self):
