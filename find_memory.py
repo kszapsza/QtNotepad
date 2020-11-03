@@ -54,7 +54,7 @@ class FindMemory:
         else:
             self.find()
 
-    def find(self):
+    def find(self) -> bool:
         file_text = self.parent.ui.textField.toPlainText()
 
         # Find direction: down
@@ -94,6 +94,8 @@ class FindMemory:
                 else:
                     self.cursor_position = 0
 
+                return False
+
         # Found a record:
         else:
             new_cursor = self.parent.ui.textField.textCursor()
@@ -103,3 +105,4 @@ class FindMemory:
             self.parent.ui.textField.setTextCursor(new_cursor)
             self.parent.query_text = self.query_text
 
+            return True
