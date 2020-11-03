@@ -37,7 +37,18 @@ class FindMemory:
     # Used to find next/previous from menubar
     def find_next_pressed(self):
         self.auto_wrap_count = 0
+        self.direction = FindDirection.DOWN
 
+        if self.query_text == '':
+            self.parent.edit_find()
+        else:
+            self.find()
+
+    def find_previous_pressed(self):
+        self.auto_wrap_count = 0
+        self.direction = FindDirection.UP
+
+        # If no text in memory, open Edit > Find in parent window:
         if self.query_text == '':
             self.parent.edit_find()
         else:
@@ -91,11 +102,4 @@ class FindMemory:
 
             self.parent.ui.textField.setTextCursor(new_cursor)
             self.parent.query_text = self.query_text
-
-    def find_previous_pressed(self):
-        # If no text in memory, open Edit > Find in parent window:
-        if self.query_text == '':
-            self.parent.edit_find()
-        else:
-            self.find()
 

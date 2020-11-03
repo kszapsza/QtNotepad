@@ -69,6 +69,14 @@ class Find(QDialog):
         else:
             self.parent.find_memory.wrap_around = False
 
+            # If cursor is at 0, the direction is UP, and we switch to "no wrap around"
+            # no results would be found, although there are. That's why we want to
+            # move cursor to the end in such a situation:
+            if (self.parent.find_memory.direction == FindDirection.UP
+                    and self.parent.find_memory.cursor_position == 0):
+                self.parent.find_memory.cursor_position \
+                    = len(self.parent.ui.textField.toPlainText())
+
     def case_mode_changed(self):
         if self.ui.match_case_checkbox.isChecked():
             self.parent.find_memory.match_case = True

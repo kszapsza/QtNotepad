@@ -41,9 +41,11 @@ class Replace(QDialog):
         self.ui.replace_with_lineedit.textChanged.connect(lambda: self.replace_text_changed())
 
         self.ui.wrap_around_checkbox.toggled.connect(lambda: self.wrap_mode_changed())
+        self.parent.find_memory.wrap_around = True
         self.ui.match_case_checkbox.toggled.connect(lambda: self.case_mode_changed())
 
         self.ui.find_button.released.connect(lambda: self.find_button_pressed())
+        self.ui.cancel_button.released.connect(lambda: self.close())
 
     def find_text_changed(self):
         self.parent.find_memory.query_text = self.ui.find_what_lineedit.text()
