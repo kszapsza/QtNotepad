@@ -1,3 +1,4 @@
+from find_logic import FindMemory
 from gui import core_gui
 
 import find
@@ -46,7 +47,10 @@ class Notepad(QMainWindow):
 
         # Text changing bindings
         self.ui.textField.textChanged.connect(lambda: self.set_changes_made())
+        self.ui.textField.textChanged.connect(lambda: self.disable_empty_text_dependent())
         self.ui.textField.selectionChanged.connect(lambda: self.disable_selection_dependent())
+
+        self.disable_empty_text_dependent()
         self.disable_selection_dependent()
 
         # File menu tab bindings
@@ -65,8 +69,10 @@ class Notepad(QMainWindow):
         self.ui.actionDelete.triggered.connect(lambda: self.ui.textField.textCursor().removeSelectedText())
         self.ui.actionFind.triggered.connect(lambda: self.edit_find())
 
-        self.ui.actionFind_next.triggered.connect(lambda: self.edit_find_next())
-        self.ui.actionFind_previous.triggered.connect(lambda: self.edit_find_previous())
+        self.find_memory = FindMemory(self)
+        self.ui.actionFind_next.triggered.connect(lambda: self.find_memory.find_next_pressed())
+        self.ui.actionFind_previous.triggered.connect(lambda: self.find_memory.find_previous_pressed())
+
         self.ui.actionReplace.triggered.connect(lambda: self.edit_replace())
         self.ui.actionGo_to.triggered.connect(lambda: self.edit_go_to())
 
@@ -106,6 +112,7 @@ class Notepad(QMainWindow):
         if self.windowTitle()[0] == '*':
             self.setWindowTitle(self.windowTitle()[1:])
 
+    # No selection == no cut/copy/delete/search in Google.
     def disable_selection_dependent(self):
         if len(self.ui.textField.textCursor().selectedText()) == 0:
             self.ui.actionCut.setDisabled(True)
@@ -117,6 +124,17 @@ class Notepad(QMainWindow):
             self.ui.actionCopy.setEnabled(True)
             self.ui.actionDelete.setEnabled(True)
             self.ui.actionSearch_in_Google.setEnabled(True)
+
+    # Empty text == no find/find next/find previous.
+    def disable_empty_text_dependent(self):
+        if len(self.ui.textField.toPlainText()) == 0:
+            self.ui.actionFind.setEnabled(False)
+            self.ui.actionFind_next.setEnabled(False)
+            self.ui.actionFind_previous.setEnabled(False)
+        else:
+            self.ui.actionFind.setEnabled(True)
+            self.ui.actionFind_next.setEnabled(True)
+            self.ui.actionFind_previous.setEnabled(True)
 
     # Prompts if user wants to save unsaved changes
     def ask_if_to_save(self):
@@ -237,14 +255,6 @@ class Notepad(QMainWindow):
     def edit_find(self):
         find_dialog = find.Find(parent=self)
         find_dialog.show()
-
-    # Edit > Find Next
-    def edit_find_next(self):
-        pass
-
-    # Edit > Find Previous
-    def edit_find_previous(self):
-        pass
 
     # Edit > Replace...
     def edit_replace(self):
