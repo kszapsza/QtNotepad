@@ -89,9 +89,6 @@ class Replace(QDialog):
 
         curr_txt = self.parent.ui.textField.toPlainText()
         replace_txt = self.ui.replace_with_lineedit.text()
-        #
-        # query_len = len(self.parent.find_memory.query_text)
-        # cursor_pos = self.parent.find_memory.cursor_position
 
         was_found = self.parent.find_memory.find()
 
