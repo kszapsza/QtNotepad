@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QDialog, QMessageBox
 class Find(QDialog):
     def __init__(self, parent: core.Notepad):
         super().__init__(parent)
+        self.parent = parent
 
         self.ui = Ui_Find()
         self.ui.setupUi(self)
@@ -45,13 +46,6 @@ class Find(QDialog):
         self.ui.find_line_edit.textChanged.connect(lambda: self.text_changed())
         self.ui.find_line_edit.setFocus()
 
-    def focusOutEvent(self, e: QFocusEvent):
-        self.setWindowOpacity(0.5)
-        self.show()
-
-    def focusInEvent(self, e: QFocusEvent):
-        self.setWindowOpacity(1)
-
     def text_changed(self):
         self.auto_wrap_count = 0
         self.rfind_end_index = 0
@@ -75,7 +69,7 @@ class Find(QDialog):
         self.find_text()
 
     def find_text(self):
-        file_text = self.parent().ui.textField.toPlainText()
+        file_text = self.parent.ui.textField.toPlainText()
         query_text = self.ui.find_line_edit.text()
 
         if self.rfind_end_index == 0:
@@ -120,9 +114,9 @@ class Find(QDialog):
 
         # Found a record:
         else:
-            new_cursor = self.parent().ui.textField.textCursor()
+            new_cursor = self.parent.ui.textField.textCursor()
             new_cursor.setPosition(result)
             new_cursor.setPosition(result + len(query_text), QTextCursor.KeepAnchor)
 
-            self.parent().ui.textField.setTextCursor(new_cursor)
-            self.parent().query_text = query_text
+            self.parent.ui.textField.setTextCursor(new_cursor)
+            self.parent.query_text = query_text
