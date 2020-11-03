@@ -129,7 +129,7 @@ class Notepad(QMainWindow):
 
     # Overriden closeEvent() method prompting if to save if unsaved changes were made
     def closeEvent(self, event: QCloseEvent):
-        if self.changes_made:
+        if self.changes_made and len(self.ui.textField.toPlainText()) != 0:
             unsaved_decision = self.ask_if_to_save()
 
             if unsaved_decision == QMessageBox.Save:
