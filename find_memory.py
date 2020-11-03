@@ -54,7 +54,7 @@ class FindMemory:
         else:
             self.find()
 
-    def find(self) -> bool:
+    def find(self, hide_not_found: bool = False) -> bool:
         file_text = self.parent.ui.textField.toPlainText()
 
         # Find direction: down
@@ -86,7 +86,8 @@ class FindMemory:
             # Do not wrap around:
             # either wrapping is set to off, or there are NO results in WHOLE text
             else:
-                FindMemory.not_found(self.parent, self.query_text)
+                if not hide_not_found:
+                    FindMemory.not_found(self.parent, self.query_text)
 
                 # "Stuck" the cursor in the end/beginning, when no wrap mode is set
                 if self.direction == FindDirection.DOWN:

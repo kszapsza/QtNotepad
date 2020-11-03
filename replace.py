@@ -83,14 +83,11 @@ class Replace(QDialog):
         self.parent.find_memory.query_text = self.ui.find_what_lineedit.text()
         self.parent.find_memory.find()
 
-    def replace_button_pressed(self):
-        self.parent.find_memory.auto_wrap_count = 0
-        self.parent.find_memory.query_text = self.ui.find_what_lineedit.text()
-
+    def replace(self, hide_not_found: bool = False) -> bool:
         curr_txt = self.parent.ui.textField.toPlainText()
         replace_txt = self.ui.replace_with_lineedit.text()
 
-        was_found = self.parent.find_memory.find()
+        was_found = self.parent.find_memory.find(hide_not_found=hide_not_found)
 
         curr_cursor = self.parent.ui.textField.textCursor()
         curr_selection_start = curr_cursor.selectionStart()
@@ -104,5 +101,20 @@ class Replace(QDialog):
 
             self.parent.ui.textField.setPlainText(new_txt)
 
+        return was_found
+
+    def replace_button_pressed(self):
+        self.parent.find_memory.auto_wrap_count = 0
+        self.parent.find_memory.query_text = self.ui.find_what_lineedit.text()
+
+        self.replace()
+
     def replace_all_button_pressed(self):
-        pass
+        self.parent.find_memory.auto_wrap_count = 0
+        self.parent.find_memory.query_text = self.ui.find_what_lineedit.text()
+        self.parent.find_memory.cursor_position = 0
+
+        was_found = True
+
+        while was_found:
+            was_found = self.replace(hide_not_found=True)
