@@ -72,7 +72,7 @@ class Ui_Find(object):
 
     def retranslateUi(self, Find):
         _translate = QtCore.QCoreApplication.translate
-        Find.setWindowTitle(_translate("Find", "Find…"))
+        Find.setWindowTitle(_translate("Find", "Find"))
         self.find_button.setText(_translate("Find", "Find next"))
         self.cancel_button.setText(_translate("Find", "Cancel"))
         self.match_case_checkbox.setText(_translate("Find", "Match case"))

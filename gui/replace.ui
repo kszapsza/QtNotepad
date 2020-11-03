@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Replace</class>
+ <widget class="QDialog" name="Replace">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>149</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Replace</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="4" column="0" rowspan="3">
+    <layout class="QHBoxLayout" name="checks_and_radios_layout">
+     <item>
+      <layout class="QVBoxLayout" name="checkbox_layout">
+       <item>
+        <widget class="QCheckBox" name="match_case_checkbox">
+         <property name="text">
+          <string>Match case</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="wrap_around_checkbox">
+         <property name="text">
+          <string>Wrap around</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="find_button">
+     <property name="text">
+      <string>Find Next</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="replace_button">
+     <property name="text">
+      <string>Replace</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="replace_all_button">
+     <property name="text">
+      <string>Replace All</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="cancel_button">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="2">
+    <layout class="QGridLayout" name="replace_form_layout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="find_what_label">
+       <property name="text">
+        <string>Find what:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="replace_with_label">
+       <property name="text">
+        <string>Replace with:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="find_what_lineedit"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="replace_with_lineedit"/>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

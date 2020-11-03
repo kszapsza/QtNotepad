@@ -1,14 +1,13 @@
-import core
 from gui.find_gui import Ui_Find
 
 from PyQt5 import QtCore
-from PyQt5.QtGui import QIcon, QTextCursor, QFocusEvent
+from PyQt5.QtGui import QIcon, QTextCursor
 from PyQt5.QtWidgets import QDialog, QMessageBox
 
 
 # Edit > Find...QDialog class.
 class Find(QDialog):
-    def __init__(self, parent: core.Notepad):
+    def __init__(self, parent):
         super().__init__(parent)
         self.parent = parent
 

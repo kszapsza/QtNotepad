@@ -1,5 +1,7 @@
 from gui import core_gui
+
 import find
+import replace
 
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QStandardPaths, QUrl
@@ -18,6 +20,7 @@ import sys
 # a commercial license that allows for the development of proprietary applications.
 
 # Window icon (icon.png) made by Freepik, http://flaticon.com/.
+
 
 # Main Notepad window class.
 class Notepad(QMainWindow):
@@ -67,13 +70,13 @@ class Notepad(QMainWindow):
         self.ui.actionReplace.triggered.connect(lambda: self.edit_replace())
         self.ui.actionGo_to.triggered.connect(lambda: self.edit_go_to())
 
-        self.ui.actionGo_to.setDisabled(False)
+        self.ui.actionGo_to.setDisabled(True)
         self.ui.actionSearch_in_Google.triggered.connect(lambda: self.edit_search_with_google())
         self.ui.actionSelect_all.triggered.connect(lambda: self.ui.textField.selectAll())
         self.ui.actionTime_date.triggered.connect(lambda: self.edit_time_date())
 
         # Format menu tab bindings
-        self.ui.actionWord_wrap.setChecked(False)
+        self.ui.actionWord_wrap.setChecked(True)
         self.ui.actionWord_wrap.triggered.connect(lambda: self.format_word_wrap())
         self.ui.actionFont.triggered.connect(lambda: self.format_font())
 
@@ -245,7 +248,8 @@ class Notepad(QMainWindow):
 
     # Edit > Replace...
     def edit_replace(self):
-        pass
+        replace_dialog = replace.Replace(parent=self)
+        replace_dialog.show()
 
     # Edit > Go To...
     def edit_go_to(self):
