@@ -1,5 +1,11 @@
 from PyQt5.QtGui import QTextCursor, QIcon
 from PyQt5.QtWidgets import QMessageBox
+from enum import Enum
+
+
+class FindDirection(Enum):
+    UP = 0
+    DOWN = 1
 
 
 # Class realising searching for text from menu level
@@ -10,8 +16,14 @@ class FindMemory:
 
         self.wrap_around = True
         self.query_text = ''
-        self.start_index = 0
+        self.cursor_position = 0
 
+        self.direction = FindDirection.DOWN
+        self.match_case = False
+
+        # This stops the recursive call of Find after one cycle - when there are
+        # no results. This flag is being reset when user manually presses Find button,
+        # or when the query text has changed.
         self.auto_wrap_count = 0
 
     @staticmethod
@@ -29,30 +41,47 @@ class FindMemory:
         if self.query_text == '':
             self.parent.edit_find()
         else:
-            self.find_down()
+            self.find()
 
-    def find_down(self):
+    def find(self):
         file_text = self.parent.ui.textField.toPlainText()
 
-        if self.wrap_around:
-            result = file_text.find(self.query_text, self.start_index)
-        else:
-            result = file_text.lower().find(self.query_text.lower(), self.start_index)
+        # Find direction: down
+        if self.direction == FindDirection.DOWN:
+            if self.match_case:
+                result = file_text.find(self.query_text, self.cursor_position)
+            else:
+                result = file_text.lower().find(self.query_text.lower(), self.cursor_position)
 
-        self.start_index = result + 1
+            self.cursor_position = result + 1
+
+        # Find direction: up
+        else:
+            if self.match_case:
+                result = file_text.rfind(self.query_text, 0, self.cursor_position)
+            else:
+                result = file_text.lower().rfind(self.query_text.lower(), 0, self.cursor_position)
+
+            self.cursor_position = result
 
         # Not found:
         if result == -1:
             # Wrap around - only once automatically
             if self.wrap_around and self.auto_wrap_count < 1:
-                self.start_index = 0
+                self.cursor_position = 0 if (self.direction == FindDirection.DOWN) else len(file_text)
                 self.auto_wrap_count += 1  # count the cycle to prevent infinite recursion
-                self.find_down()  # call only once again recursively
+                self.find()  # call only once again recursively
 
             # Do not wrap around:
             # either wrapping is set to off, or there are NO results in WHOLE text
             else:
                 FindMemory.not_found(self.parent, self.query_text)
+
+                # "Stuck" the cursor in the end/beginning, when no wrap mode is set
+                if self.direction == FindDirection.DOWN:
+                    self.cursor_position = len(file_text) + 1
+                else:
+                    self.cursor_position = 0
 
         # Found a record:
         else:
@@ -68,8 +97,5 @@ class FindMemory:
         if self.query_text == '':
             self.parent.edit_find()
         else:
-            self.find_up()
-
-    def find_up(self):
-        pass
+            self.find()
 

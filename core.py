@@ -1,4 +1,4 @@
-from find_logic import FindMemory
+from find_memory import FindMemory
 from gui import core_gui
 
 import find
@@ -36,10 +36,6 @@ class Notepad(QMainWindow):
 
         self.last_path = QStandardPaths.displayName(QStandardPaths.DesktopLocation)
         self.zoom_amnt = 0
-
-        # Find/replace data need to be stored in parent window class in order to
-        # make possibility for calling Find previous/Find next from the main window menu bar.
-        self.query_text = None
 
         # Opened file data
         self.opened_filepath = 'Untitled'
